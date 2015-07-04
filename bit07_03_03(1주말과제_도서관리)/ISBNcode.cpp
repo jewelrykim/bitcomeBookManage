@@ -113,6 +113,8 @@ int MSearch(ISBN* BookArray, int BookNum,int Bookdata, char* SearchBookdata, int
 void SearchBook(ISBN * BookArray,int WiterNum,int TableNum , int BookNum){
 	char Searchtype = '1';
 	char SearchBookdata[128] = { ' ' };
+	int SearchBookindex = 0;
+	int * flag = (int *)malloc(sizeof(int)*BookNum);
 	printf("검색 방법 선택(1.제목검색 , 2.저자검색, 3.목차검색, 0.검색취소: ");
 	Searchtype = getchar();
 	while (Searchtype != '0'){
@@ -121,7 +123,6 @@ void SearchBook(ISBN * BookArray,int WiterNum,int TableNum , int BookNum){
 		case '1':	
 			printf("1. 제목검색\n 검색하고 싶은 도서 명 :");
 			gets(SearchBookdata);
-			int SearchBookindex = 0;
 			fflush(stdin);
 			if (SSearch(BookArray, BookNum,SearchBookdata,&SearchBookindex) == 0){
 				Print(BookArray + SearchBookindex,WiterNum,TableNum);
@@ -132,8 +133,7 @@ void SearchBook(ISBN * BookArray,int WiterNum,int TableNum , int BookNum){
 			printf("2. 저자검색\n 검색하고 싶은 저자 :");
 			gets(SearchBookdata);
 			fflush(stdin);
-			int * flag = (int *)malloc(sizeof(int)*BookNum);
-			if (MSearch(BookArray, BookNum, WiterNum, SearchBookdata, &SearchBookindex) == 0){
+			if (MSearch(BookArray, BookNum, WiterNum, SearchBookdata, flag) == 0){
 				Print(BookArray + SearchBookindex, WiterNum, TableNum);
 			}
 			Searchtype = '0';
@@ -142,8 +142,7 @@ void SearchBook(ISBN * BookArray,int WiterNum,int TableNum , int BookNum){
 			printf("3. 목차검색\n 검색하고 싶은 목차 :");
 			gets(SearchBookdata);
 			fflush(stdin);
-			int * flag = (int *)malloc(sizeof(int)*BookNum);
-			if (MSearch(BookArray, BookNum, WiterNum, SearchBookdata, &SearchBookindex) == 0){
+			if (MSearch(BookArray, BookNum, WiterNum, SearchBookdata, flag) == 0){
 				Print(BookArray + SearchBookindex, WiterNum, TableNum);
 			}
 			Searchtype = '0';
@@ -153,6 +152,7 @@ void SearchBook(ISBN * BookArray,int WiterNum,int TableNum , int BookNum){
 		}
 	}
 	//메시지 출력(성공 실패)
+	free(flag);
 }
 void main(){
 	ISBN * BookArray = {};
