@@ -6,7 +6,6 @@
 #include <ctype.h>
 //수정할 내용
 //메시지 출력 printf("%s", );
-//메모리 관리 free
 
 typedef struct _ISBN
 {
@@ -169,7 +168,7 @@ int MSearchT(ISBN* BookArray, int BookNum, char* SearchBookdata, int * SearchBoo
 		}
 	}
 }
-void SearchBook(ISBN * BookArray, int BookNum){
+void SearchBook(ISBN * BookArray, int BookNum, char* *SearchMsg){
 	char Searchtype = '1';
 	char SearchBookdata[1024] ;
 	int SearchBookIndex = 0;
@@ -221,25 +220,26 @@ void SearchBook(ISBN * BookArray, int BookNum){
 			break;
 		}
 	}
-	//메시지 출력(성공 실패)
+	printf("%s", SearchMsg[ReturnSearch]);
 	free(SearchBookArray);
 }
-void ChangeBook(ISBN * BookArray, int BookNum){
+void ChangeBook(ISBN * BookArray, int BookNum, char* *SearchMsg,  char* *ChangeMsg){
 	char SearchBookdata[128] = { ' ' };
 	int SearchBookIndex = 0;
 	printf("수정하고 싶은 도서 명 :");
 	gets(SearchBookdata);
 	fflush(stdin);
 	int ReturnSearch = SSearch(BookArray, BookNum, SearchBookdata, &SearchBookIndex);
+	printf("%s", SearchMsg[ReturnSearch]);
 	if (ReturnSearch == 0){
 		printf("수정할 정보 :");
 		KillData(&BookArray[SearchBookIndex]);
 		InputBookData(&BookArray[SearchBookIndex]);
 	}
-	//메시지 출력 printf("%s", );
+	printf("%s", ChangeMsg[ReturnSearch]);
 }
 
-void DeleteBook(ISBN * BookArray, int *BookNum){
+void DeleteBook(ISBN * BookArray, int *BookNum, char* *DeleteMsg){
 	char SearchBookdata[128] = { ' ' };
 	int SearchBookIndex = 0;
 	printf("수정하고 싶은 도서 명 :");
@@ -247,7 +247,6 @@ void DeleteBook(ISBN * BookArray, int *BookNum){
 	fflush(stdin);
 	int ReturnSearch = SSearch(BookArray, *BookNum, SearchBookdata, &SearchBookIndex);
 	if (ReturnSearch == 0){
-		KillData(BookArray);
 		for (int i = SearchBookIndex; i < *BookNum; i++){
 			KillData(&BookArray[i]);
 			BookArray[i].Title = BookArray[i + 1].Title;
@@ -262,7 +261,7 @@ void DeleteBook(ISBN * BookArray, int *BookNum){
 		}
 		*BookNum -= 1;
 	}
-	//메시지 출력 printf("%s", );
+	printf("%s", DeleteMsg[ReturnSearch]);
 }
 void FilePrint(ISBN* BookArray, int TotalBook, int BookNum){
 	FILE *fp;
@@ -333,6 +332,9 @@ void FileScan(ISBN* BookArray, int *TotalBook, int *BookNum){
 	fclose(fp);
 }
 void main(){
+	char * SearchMsg[] = { "찾기성공", "삭제 등록된 데이터가 없습니다.", "찾으려는 데이터가 존재하지 않습니다." };
+	char * ChangeMsg[] = { "수정성공", "등록된 데이터가 없습니다.", "찾으려는 데이터가 존재하지 않습니다." };
+	char * DeleteMsg[] = { "삭제성공", "삭제 등록된 데이터가 없습니다.", "찾으려는 데이터가 존재하지 않습니다." };
 	ISBN * BookArray = {};
 	char mode = '1';
 	int TotalBook=10;
@@ -352,13 +354,13 @@ void main(){
 			PrintBookList(BookArray, BookNum);
 			break;
 		case '3':
-			SearchBook(BookArray, BookNum);
+			SearchBook(BookArray, BookNum, SearchMsg);
 			break;
 		case '4':
-			ChangeBook(BookArray, BookNum);
+			ChangeBook(BookArray, BookNum, SearchMsg, ChangeMsg);
 			break;
 		case '5':
-			DeleteBook(BookArray, &BookNum);
+			DeleteBook(BookArray, &BookNum, DeleteMsg);
 			break;
 		case '6':
 			FilePrint(BookArray, TotalBook, BookNum);
