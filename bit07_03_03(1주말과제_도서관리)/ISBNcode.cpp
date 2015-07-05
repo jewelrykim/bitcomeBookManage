@@ -55,6 +55,17 @@ int NewBookDataTable(char * *Bookdata, char* PrintMessage){
 	}
 	return 20;
 }
+void KillData(ISBN * BookArray){
+	BookArray->Title = NULL;
+	for (int i = 0; i < BookArray->WriterNum; i++){
+		BookArray->Writer[i]=NULL;
+	}
+	BookArray->Company = NULL;
+	BookArray->Price = NULL;
+	for (int i = 0; i < BookArray->TableNum; i++){
+		BookArray->Table[i] = NULL;
+	}
+}
 void InputBookData(ISBN* BookArray){
 	int WiterNum = 0;
 	int TableNum = 0;
@@ -222,7 +233,7 @@ void ChangeBook(ISBN * BookArray, int BookNum){
 	int ReturnSearch = SSearch(BookArray, BookNum, SearchBookdata, &SearchBookIndex);
 	if (ReturnSearch == 0){
 		printf("수정할 정보 :");
-		//메모리 관리 free
+		KillData(&BookArray[SearchBookIndex]);
 		InputBookData(&BookArray[SearchBookIndex]);
 	}
 	//메시지 출력 printf("%s", );
@@ -236,8 +247,9 @@ void DeleteBook(ISBN * BookArray, int *BookNum){
 	fflush(stdin);
 	int ReturnSearch = SSearch(BookArray, *BookNum, SearchBookdata, &SearchBookIndex);
 	if (ReturnSearch == 0){
-		//메모리 관리 free
+		KillData(BookArray);
 		for (int i = SearchBookIndex; i < *BookNum; i++){
+			KillData(&BookArray[i]);
 			BookArray[i].Title = BookArray[i + 1].Title;
 			for (int j = 0; j < BookArray[i].WriterNum; j++){
 				BookArray[i].Writer[j] = BookArray[i + 1].Writer[j];
@@ -356,7 +368,8 @@ void main(){
 			break;
 		default:
 			mode = '0';
-			free(BookArray);
+			for (int i= 0; i < TotalBook;i++)
+			KillData(&BookArray[i]);
 			break;
 		}
 	}
