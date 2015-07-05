@@ -117,9 +117,10 @@ int MSearchW(ISBN* BookArray, int BookNum, char* SearchBookdata, int * SearchBoo
 	else{
 		for (int iCurrentBookNum = 0; iCurrentBookNum < BookNum; iCurrentBookNum++){
 			for (int j = 0; j < BookArray[iCurrentBookNum].WriterNum; j++){
-				if (strcmp(SearchBookdata, BookArray[iCurrentBookNum].Writer[j]) == 0){
+				if (strstr(BookArray[iCurrentBookNum].Writer[j],SearchBookdata) != 0){
 					SearchBookArray[index] = iCurrentBookNum;
 					index++;
+					break;
 				}
 			}
 		}
@@ -141,9 +142,10 @@ int MSearchT(ISBN* BookArray, int BookNum, char* SearchBookdata, int * SearchBoo
 	else{
 		for (int iCurrentBookNum = 0; iCurrentBookNum < BookNum; iCurrentBookNum++){
 			for (int j = 0; j < BookArray[iCurrentBookNum].TableNum; j++){
-				if (strcmp(SearchBookdata, BookArray[iCurrentBookNum].Table[j]) == 0){
+					if (strcmp(BookArray[iCurrentBookNum].Table[j],SearchBookdata ) == 0){
 					SearchBookArray[index] = iCurrentBookNum;
 					index++;
+					break;
 				}
 			}
 		}
@@ -162,7 +164,7 @@ void SearchBook(ISBN * BookArray, int BookNum){
 	int SearchBookIndex = 0;
 	int * SearchBookArray = (int *)malloc(sizeof(int)*BookNum);
 	int ReturnSearch = 0;
-	printf("검색 방법 선택(1.제목검색 , 2.저자검색, 3.목차검색, 0.검색취소: ");
+	printf("검색 방법 선택(1.제목검색 , 2.저자검색, 3.목차검색, 0.검색취소: )");
 	Searchtype = getchar();
 	fflush(stdin);
 	while (Searchtype != '0'){
@@ -225,24 +227,31 @@ void ChangeBook(ISBN * BookArray, int BookNum){
 	}
 	//메시지 출력 printf("%s", );
 }
-//void DeleteBook(ISBN * BookArray, int WiterNum, int TableNum, int BookNum){
-//	char SearchBookdata[128] = { ' ' };
-//	int SearchBookIndex = 0;
-//	printf("수정하고 싶은 도서 명 :");
-//	gets(SearchBookdata);
-//	fflush(stdin);
-//	int ReturnSearch = SSearch(BookArray, BookNum, SearchBookdata, &SearchBookIndex);
-//	if (ReturnSearch == 0){
-//		printf("수정할 정보 :");
-//		//메모리 관리 free
-//		for (int i = SearchBookIndex; i < BookNum; i++){
-//			BookArray[i].Title = BookArray[i + 1].Title;
-//			for (int j = WiterNum)
-//			BookArray[i].Writer[]
-//		}
-//	}
-//	//메시지 출력 printf("%s", );
-//}
+
+void DeleteBook(ISBN * BookArray, int *BookNum){
+	char SearchBookdata[128] = { ' ' };
+	int SearchBookIndex = 0;
+	printf("수정하고 싶은 도서 명 :");
+	gets(SearchBookdata);
+	fflush(stdin);
+	int ReturnSearch = SSearch(BookArray, *BookNum, SearchBookdata, &SearchBookIndex);
+	if (ReturnSearch == 0){
+		//메모리 관리 free
+		for (int i = SearchBookIndex; i < *BookNum; i++){
+			BookArray[i].Title = BookArray[i + 1].Title;
+			for (int j = 0; j < BookArray[i].WriterNum; j++){
+				BookArray[i].Writer[j] = BookArray[i + 1].Writer[j];
+			}
+			BookArray[i].Company = BookArray[i + 1].Company;
+			BookArray[i].Price = BookArray[i + 1].Price;
+			for (int j = 0; j < BookArray[i].TableNum; j++){
+				BookArray[i].Table[j] = BookArray[i + 1].Table[j];
+			}
+		}
+		*BookNum -= 1;
+	}
+	//메시지 출력 printf("%s", );
+}
 void FilePrint(ISBN* BookArray, int TotalBook, int BookNum){
 	FILE *fp;
 	printf("도서목록을 저장합니다.\n");
@@ -288,14 +297,13 @@ void FileScan(ISBN* BookArray, int *TotalBook, int *BookNum){
 		printf("도서목록을 읽어옵니다.\n");
 		fscanf(fp, "%d\n", TotalBook);
 		int index = 0;
+		BookArray[0].Title = NULL;
 		free(BookArray);
 		BookArray = (ISBN *)malloc(sizeof(BookArray)* (*TotalBook));
 		while (!feof(fp))
 		{
 			if (FileDataScan(fp, &BookArray[index].Title) == NULL)break;
-			//iWriterNum = FileDataIndex(fp, &BookArray[index].WriterNum);
 			fscanf(fp, "%d\n", &BookArray[index].WriterNum);
-			//BookArray[index].WriterNum = 3;
 			for (int i = 0; i < BookArray[index].WriterNum; i++){
 				FileDataScan(fp, &BookArray[index].Writer[i]);
 			}
@@ -338,7 +346,7 @@ void main(){
 			ChangeBook(BookArray, BookNum);
 			break;
 		case '5':
-			//DeleteBook(BookArray, BookNum);
+			DeleteBook(BookArray, &BookNum);
 			break;
 		case '6':
 			FilePrint(BookArray, TotalBook, BookNum);
@@ -352,7 +360,6 @@ void main(){
 			break;
 		}
 	}
-
 }
 
 
