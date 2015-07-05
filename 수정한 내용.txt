@@ -1,0 +1,6 @@
+Change함수 생성
+search함수내 변수 수정
+전체 함수 메게변수 순서 통일
+WiterNum,TableNum 구조체 안에 넣어 각 객체가 정보를 갖고 있게 함
+MSearch를 MSearchW,MSearchT로 분할
+i -> iCurrentBookNum 수정
